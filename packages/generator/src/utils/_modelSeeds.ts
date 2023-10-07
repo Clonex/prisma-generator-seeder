@@ -1,6 +1,5 @@
 // @ts-nocheck
 
-/* import { ModelRelations } from './schema';*/
 import { Prisma, PrismaPromise } from '@prisma/client';
 
 export type Models = Prisma.TypeMap['model'];
@@ -17,5 +16,5 @@ export type Resolver<ModelName extends ModelNames> = (
 	parents: ResolverObject<ModelName>
 ) => PrismaPromise<Models[ModelName]['operations']['create']['result']>;
 
-export type Mockers = { [ModelName in ModelNames]: Resolver<ModelName> };
-export type NullableMockers = { [ModelName in ModelNames]?: Resolver<ModelName> };
+export type ModelSeeds = { [ModelName in ModelNames]: Resolver<ModelName> };
+export type NullableModelSeeds = { [ModelName in ModelNames]?: Resolver<ModelName> };

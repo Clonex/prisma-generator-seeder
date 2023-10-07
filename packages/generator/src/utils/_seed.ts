@@ -2,9 +2,9 @@
 
 export async function mockData<ModelName extends ModelNames>(
 	target: ModelName,
-	mockers: Mockers
+	modelSeeds: ModelSeeds
 ): Promise<Resolver<ModelName>> {
-	const mockFunction = mockers[target];
+	const mockFunction = modelSeeds[target];
 	if (!mockFunction) {
 		throw new Error(`Missing mocker for "${target}"`);
 	}
@@ -15,7 +15,7 @@ export async function mockData<ModelName extends ModelNames>(
 		await Promise.all(
 			neededModels.map(async model => {
 				return {
-					[model]: await mockData(model, mockers),
+					[model]: await mockData(model, modelSeeds),
 				};
 			})
 		)
@@ -31,9 +31,9 @@ export async function mockData<ModelName extends ModelNames>(
 	return object as Resolver<ModelName>;
 }
 
-export async function seedDatabase(mockers: Mockers) {
-	const keys = Object.keys(mockers) as ModelNames[];
+export async function seedDatabase(modelSeeds: ModelSeeds) {
+	const keys = Object.keys(modelSeeds) as ModelNames[];
 	for (const name of keys) {
-		await mockData(name, mockers);
+		await mockData(name, modelSeeds);
 	}
 }

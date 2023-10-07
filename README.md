@@ -13,7 +13,7 @@ it.
 ```javascript
 generator DatabaseSeeder {
   provider = "prisma-generator-seeder"
-  output   = "./mocking.ts" // Path for the genereated types, relative to your prisma.schema.
+  output   = "./seeding.ts" // Path for the genereated types, relative to your prisma.schema.
 }
 ```
 
@@ -23,14 +23,14 @@ generator DatabaseSeeder {
 yarn prisma generate
 ```
 
-3. Define how each prisma model should be mocked in your `seed.ts` file.
+3. Define how each prisma model should be seeded in your `seed.ts` file.
 
 ```javascript
-import { seedDatabase, Mockers } from './mocking';
+import { seedDatabase, ModelSeeds } from './seeding';
 import { database } from '../../database';
 import { faker } from '@faker-js/faker';
 
-const mockers: Mockers = {
+const modelSeeds: ModelSeeds = {
 	Country: () => {
 		return database.country.create({
 			data: {
@@ -57,5 +57,5 @@ const mockers: Mockers = {
 	},
 };
 
-seedDatabase(mockers).then(() => console.log('Seeded database'));
+seedDatabase(modelSeeds).then(() => console.log('Seeded database'));
 ```

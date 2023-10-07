@@ -3,4 +3,4 @@ types/*
 prisma/*.db*
 prisma/migrations
 
-*/mocking.ts
+*/modelSeeds.ts

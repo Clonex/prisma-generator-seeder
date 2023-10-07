@@ -2,7 +2,7 @@ import { generatorHandler, GeneratorOptions } from '@prisma/generator-helper';
 import { GENERATOR_NAME } from './constants';
 import { writeFileSafely } from './utils/writeFileSafely';
 import { genRelations } from './helpers/genRelations';
-import { getMockTypes, getSeedTools } from './utils/getMockerTypes';
+import { getModelSeedTypes, getSeedTools } from './utils/getModelSeedTypes';
 
 const { version } = require('../package.json');
 
@@ -17,11 +17,11 @@ generatorHandler({
 	},
 	onGenerate: async (options: GeneratorOptions) => {
 		const relations = genRelations(options.dmmf);
-		const [mockerTypes, seedTools] = await Promise.all([getMockTypes(), getSeedTools()]);
+		const [modelSeedTypes, seedTools] = await Promise.all([getModelSeedTypes(), getSeedTools()]);
 
 		await writeFileSafely(
 			options.generator.output?.value!,
-			`${mockerTypes}
+			`${modelSeedTypes}
 			${relations}
 			${seedTools}`
 		);

@@ -1,8 +1,8 @@
-import { Mockers } from '../mocking';
+import { ModelSeeds } from '../modelSeeds';
 import { faker } from '@faker-js/faker';
 import { database } from '../../database';
 
-export const mockers: Mockers = {
+export const mockers: ModelSeeds = {
 	Country: () => {
 		return database.country.create({
 			data: {
