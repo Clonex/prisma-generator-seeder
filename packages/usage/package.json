@@ -10,7 +10,12 @@
 	"dependencies": {
 		"@prisma/client": "5.4.1"
 	},
+	"prisma": {
+		"seed": "ts-node prisma/seed.ts"
+	},
 	"devDependencies": {
+		"@faker-js/faker": "^8.1.0",
+		"@types/faker": "^6.6.9",
 		"@types/node": "16.11.7",
 		"prisma": "5.4.1",
 		"prisma-generator-seeder": "1.0.0",

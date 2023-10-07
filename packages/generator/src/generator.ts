@@ -1,16 +1,15 @@
 import { generatorHandler, GeneratorOptions } from '@prisma/generator-helper';
-import path from 'path';
+import { join } from 'path';
 import { GENERATOR_NAME } from './constants';
 import { writeFileSafely } from './utils/writeFileSafely';
 import { genRelations } from './helpers/genRelations';
-import { writeFile } from 'fs/promises';
+import { getMockTypes, getSeedTools } from './utils/getMockerTypes';
 
 const { version } = require('../package.json');
 
 generatorHandler({
 	onManifest() {
 		console.info(`${GENERATOR_NAME}:Registered`);
-		console.log('Hello?');
 		return {
 			version,
 			defaultOutput: '../generated',
@@ -19,9 +18,15 @@ generatorHandler({
 	},
 	onGenerate: async (options: GeneratorOptions) => {
 		const relations = genRelations(options.dmmf);
-		const writeLocation = path.join(options.generator.output?.value!, `schema.ts`);
+		const [mockerTypes, seedTools] = await Promise.all([getMockTypes(), getSeedTools()]);
 
-		await writeFileSafely(writeLocation, relations);
-		await writeFile(path.join(options.generator.output?.value!, `debug.json`), JSON.stringify(options.dmmf));
+		const writeLocation = join(options.generator.output?.value!, `mocking.ts`);
+
+		await writeFileSafely(
+			writeLocation,
+			`${relations}
+			${mockerTypes}
+			${seedTools}`
+		);
 	},
 });

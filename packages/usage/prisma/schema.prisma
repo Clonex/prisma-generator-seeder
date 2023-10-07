@@ -13,15 +13,27 @@ datasource db {
   url      = "file:./dev.db"
 }
 
-model TestParent {
-  id       String      @id @default(uuid())
-  title    String
-  elements TestChild[]
+model Country {
+  id     String   @id @default(uuid())
+  name   String
+  people Person[]
+  houses House[]
 }
 
-model TestChild {
-  id         String     @id @default(uuid())
-  title      String
-  parentId   String
-  TestParent TestParent @relation(fields: [parentId], references: [id])
+model House {
+  id        String   @id @default(uuid())
+  address   String
+  people    Person[]
+  countryId String
+  country   Country  @relation(fields: [countryId], references: [id])
+}
+
+model Person {
+  id        String @id @default(uuid())
+  fullName  String
+  houseId   String
+  countryId String
+
+  house   House   @relation(fields: [houseId], references: [id])
+  country Country @relation(fields: [countryId], references: [id])
 }

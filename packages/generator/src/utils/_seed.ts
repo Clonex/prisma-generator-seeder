@@ -1,8 +1,9 @@
-import { mockers } from '.';
-import { ModelNames, Resolver, ResolverObject } from '../types/mockers';
-import { modelRelations } from '../types/schema';
+// @ts-nocheck
 
-async function mockData<ModelName extends ModelNames>(target: ModelName): Promise<Resolver<ModelName>> {
+export async function mockData<ModelName extends ModelNames>(
+	target: ModelName,
+	mockers: Mockers
+): Promise<Resolver<ModelName>> {
 	const mockFunction = mockers[target];
 	if (!mockFunction) {
 		throw new Error(`Missing mocker for "${target}"`);
@@ -14,7 +15,7 @@ async function mockData<ModelName extends ModelNames>(target: ModelName): Promis
 		await Promise.all(
 			neededModels.map(async model => {
 				return {
-					[model]: await mockData(model),
+					[model]: await mockData(model, mockers),
 				};
 			})
 		)
@@ -32,12 +33,9 @@ async function mockData<ModelName extends ModelNames>(target: ModelName): Promis
 	return object as Resolver<ModelName>;
 }
 
-async function test() {
+export async function seedDatabase(mockers: Mockers) {
 	const keys = Object.keys(mockers) as ModelNames[];
 	for (const name of keys) {
-		const data = await mockData(name);
-		console.log('Mocked', name);
+		await mockData(name, mockers);
 	}
 }
-
-test();
