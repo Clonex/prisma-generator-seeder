@@ -22,6 +22,6 @@ generatorHandler({
 		const writeLocation = path.join(options.generator.output?.value!, `schema.ts`);
 
 		await writeFileSafely(writeLocation, relations);
-		await writeFile(path.join(options.generator.output?.value!, `debug.json`), JSON.stringify(options));
+		await writeFile(path.join(options.generator.output?.value!, `debug.json`), JSON.stringify(options.dmmf));
 	},
 });

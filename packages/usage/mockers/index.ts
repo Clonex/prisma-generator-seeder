@@ -1,15 +1,20 @@
 import { Mockers } from '../types/mockers';
+import { database } from '../database';
 
 export const mockers: Mockers = {
 	TestChild: ({ TestParent }) => {
-		return {
-			title: 'Ranomized title',
-			parentId: TestParent.id,
-		};
+		return database.testChild.create({
+			data: {
+				title: 'Ranomized title',
+				parentId: TestParent.id,
+			},
+		});
 	},
 	TestParent: () => {
-		return {
-			title: 'Random title',
-		};
+		return database.testParent.create({
+			data: {
+				title: 'Random title',
+			},
+		});
 	},
 };
