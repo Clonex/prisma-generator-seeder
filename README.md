@@ -1,5 +1,8 @@
 # prisma-generator-seeder
 
+Automaticly seeds your database with dummy data. It will automaticly create each model, and the relations required for
+it.
+
 > This generator was bootstraped using
 > [create-prisma-generator](https://github.com/YassinEldeeb/create-prisma-generator)
 
