@@ -1,6 +1,6 @@
 generator custom_generator {
   provider = "node ../../node_modules/prisma-generator-seeder"
-  output   = "../types"
+  output   = "."
 }
 
 generator client {

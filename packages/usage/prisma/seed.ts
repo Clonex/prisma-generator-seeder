@@ -1,4 +1,4 @@
 import { mockers } from './mockers';
-import { seedDatabase } from '../types/mocking';
+import { seedDatabase } from './mocking';
 
-seedDatabase(mockers);
+seedDatabase(mockers).then(() => console.log('Seeded database'));

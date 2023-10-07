@@ -5,13 +5,16 @@
 	"main": "src/app.js",
 	"license": "MIT",
 	"scripts": {
-		"dev": "ts-node-dev --respawn --transpile-only ./prisma/seed.ts --module=nodenext"
+		"dev": "ts-node-dev --respawn --transpile-only ./prisma/seed.ts --module=nodenext",
+		"migrate": "prisma migrate dev --name init",
+		"studio": "prisma studio",
+		"seed": "prisma db seed"
 	},
 	"dependencies": {
 		"@prisma/client": "5.4.1"
 	},
 	"prisma": {
-		"seed": "ts-node prisma/seed.ts"
+		"seed": "ts-node prisma/seed.ts --transpile-only --module=nodenext"
 	},
 	"devDependencies": {
 		"@faker-js/faker": "^8.1.0",
@@ -19,6 +22,7 @@
 		"@types/node": "20.8.3",
 		"prisma": "5.4.1",
 		"prisma-generator-seeder": "1.0.0",
+		"ts-node": "^10.9.1",
 		"ts-node-dev": "^2.0.0",
 		"typescript": "5.2.2"
 	}

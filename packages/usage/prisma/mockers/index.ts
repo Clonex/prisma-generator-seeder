@@ -1,6 +1,6 @@
-import { Mockers } from '../types/mocking';
+import { Mockers } from '../mocking';
 import { faker } from '@faker-js/faker';
-import { database } from '../database';
+import { database } from '../../database';
 
 export const mockers: Mockers = {
 	Country: () => {

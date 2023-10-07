@@ -1,4 +1,6 @@
 types/*
 
-prisma/dev.db
+prisma/*.db*
 prisma/migrations
+
+*/mocking.ts
