@@ -6,6 +6,15 @@ it.
 > This generator was bootstraped using
 > [create-prisma-generator](https://github.com/YassinEldeeb/create-prisma-generator)
 
+# Generated files
+
+| Export                                               | Description                                                |
+| ---------------------------------------------------- | ---------------------------------------------------------- |
+| seedModel(target: ModelName, modelSeeds: ModelSeeds) | Automaticly creates the given model, and its relations.    |
+| seedDatabase(modelSeeds: ModelSeeds)                 | Automaticly seeds all models for the whole schema.         |
+| ModelSeeds                                           | Type for the object that defines how to create each model. |
+| NullableModelSeeds                                   | Similar to ModelSeeds, but no model is required.           |
+
 # Setup
 
 1. Add the generator to your `schema.prisma` file.

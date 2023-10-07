@@ -1,6 +1,6 @@
 // @ts-nocheck
 
-export async function mockData<ModelName extends ModelNames>(
+export async function seedModel<ModelName extends ModelNames>(
 	target: ModelName,
 	modelSeeds: ModelSeeds
 ): Promise<Resolver<ModelName>> {
@@ -15,7 +15,7 @@ export async function mockData<ModelName extends ModelNames>(
 		await Promise.all(
 			neededModels.map(async model => {
 				return {
-					[model]: await mockData(model, modelSeeds),
+					[model]: await seedModel(model, modelSeeds),
 				};
 			})
 		)
@@ -34,6 +34,6 @@ export async function mockData<ModelName extends ModelNames>(
 export async function seedDatabase(modelSeeds: ModelSeeds) {
 	const keys = Object.keys(modelSeeds) as ModelNames[];
 	for (const name of keys) {
-		await mockData(name, modelSeeds);
+		await seedModel(name, modelSeeds);
 	}
 }
