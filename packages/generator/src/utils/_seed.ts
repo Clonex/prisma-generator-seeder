@@ -26,8 +26,6 @@ export async function mockData<ModelName extends ModelNames>(
 		};
 	}, {}) as ResolverObject<ModelName>;
 
-	console.log(mockFunction, relatedData);
-
 	const object = await mockFunction(relatedData);
 
 	return object as Resolver<ModelName>;
