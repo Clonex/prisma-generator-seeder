@@ -13,7 +13,7 @@ it.
 ```javascript
 generator DatabaseSeeder {
   provider = "prisma-generator-seeder"
-  output   = "."
+  output   = "." // mocking.ts is placed here, relative to your prisma.schema.
 }
 ```
 
