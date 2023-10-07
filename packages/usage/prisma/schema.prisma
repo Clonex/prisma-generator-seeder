@@ -1,4 +1,4 @@
-generator custom_generator {
+generator seeder {
   provider = "node ../../node_modules/prisma-generator-seeder"
   output   = "."
 }
