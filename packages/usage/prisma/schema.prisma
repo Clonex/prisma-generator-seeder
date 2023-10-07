@@ -1,6 +1,6 @@
 generator seeder {
   provider = "node ../../node_modules/prisma-generator-seeder"
-  output   = "."
+  output   = "./mocking.ts"
 }
 
 generator client {

@@ -1,5 +1,4 @@
 import { generatorHandler, GeneratorOptions } from '@prisma/generator-helper';
-import { join } from 'path';
 import { GENERATOR_NAME } from './constants';
 import { writeFileSafely } from './utils/writeFileSafely';
 import { genRelations } from './helpers/genRelations';
@@ -20,12 +19,10 @@ generatorHandler({
 		const relations = genRelations(options.dmmf);
 		const [mockerTypes, seedTools] = await Promise.all([getMockTypes(), getSeedTools()]);
 
-		const writeLocation = join(options.generator.output?.value!, `mocking.ts`);
-
 		await writeFileSafely(
-			writeLocation,
-			`${relations}
-			${mockerTypes}
+			options.generator.output?.value!,
+			`${mockerTypes}
+			${relations}
 			${seedTools}`
 		);
 	},
