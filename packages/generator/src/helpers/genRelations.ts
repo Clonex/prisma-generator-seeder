@@ -6,6 +6,7 @@ export const genRelations = (input: DMMF.Document) => {
 
 	for (const model of input.datamodel.models) {
 		const relations = getRelationSet(model.fields);
+
 		ret += `"${model.name}": ${JSON.stringify(relations)},`;
 	}
 

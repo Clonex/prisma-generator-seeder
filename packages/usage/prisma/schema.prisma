@@ -3,6 +3,11 @@ generator custom_generator {
   output   = "../types"
 }
 
+generator client {
+  provider        = "prisma-client-js"
+  previewFeatures = ["metrics", "views"]
+}
+
 datasource db {
   provider = "sqlite"
   url      = "file:./dev.db"
@@ -15,8 +20,8 @@ model TestParent {
 }
 
 model TestChild {
-  id          String     @id @default(uuid())
-  title       String
-  containerId String
-  TestParent  TestParent @relation(fields: [containerId], references: [id])
+  id         String     @id @default(uuid())
+  title      String
+  parentId   String
+  TestParent TestParent @relation(fields: [parentId], references: [id])
 }

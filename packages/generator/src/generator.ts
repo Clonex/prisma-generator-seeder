@@ -3,6 +3,7 @@ import path from 'path';
 import { GENERATOR_NAME } from './constants';
 import { writeFileSafely } from './utils/writeFileSafely';
 import { genRelations } from './helpers/genRelations';
+import { writeFile } from 'fs/promises';
 
 const { version } = require('../package.json');
 
@@ -21,5 +22,6 @@ generatorHandler({
 		const writeLocation = path.join(options.generator.output?.value!, `schema.ts`);
 
 		await writeFileSafely(writeLocation, relations);
+		await writeFile(path.join(options.generator.output?.value!, `debug.json`), JSON.stringify(options));
 	},
 });
