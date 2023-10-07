@@ -4,31 +4,19 @@ generator custom_generator {
 }
 
 datasource db {
-  provider = "postgresql"
-  url      = env("DATABASE_URL")
+  provider = "sqlite"
+  url      = "file:./dev.db"
 }
 
-model User {
-  id    Int     @id @default(autoincrement())
-  email String  @unique
-  name  String?
+model TestParent {
+  id       String      @id @default(uuid())
+  title    String
+  elements TestChild[]
 }
 
-enum NotificationType {
-  newPosts
-  newComments
-  newFollowers
-  reply
-  heartOnPost
-  heartOnComment
-  heartOnReply
-}
-
-enum Language {
-  Typescript
-  Javascript
-  Rust
-  Go
-  Python
-  Cpp
+model TestChild {
+  id          String     @id @default(uuid())
+  title       String
+  containerId String
+  TestParent  TestParent @relation(fields: [containerId], references: [id])
 }

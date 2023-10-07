@@ -1,30 +1,25 @@
-import { generatorHandler, GeneratorOptions } from '@prisma/generator-helper'
-import path from 'path'
-import { GENERATOR_NAME } from './constants'
-import { genEnum } from './helpers/genEnum'
-import { writeFileSafely } from './utils/writeFileSafely'
+import { generatorHandler, GeneratorOptions } from '@prisma/generator-helper';
+import path from 'path';
+import { GENERATOR_NAME } from './constants';
+import { writeFileSafely } from './utils/writeFileSafely';
+import { genRelations } from './helpers/genRelations';
 
-const { version } = require('../package.json')
+const { version } = require('../package.json');
 
 generatorHandler({
-  onManifest() {
-    console.info(`${GENERATOR_NAME}:Registered`)
-    return {
-      version,
-      defaultOutput: '../generated',
-      prettyName: GENERATOR_NAME,
-    }
-  },
-  onGenerate: async (options: GeneratorOptions) => {
-    options.dmmf.datamodel.enums.forEach(async (enumInfo) => {
-      const tsEnum = genEnum(enumInfo)
+	onManifest() {
+		console.info(`${GENERATOR_NAME}:Registered`);
+		console.log('Hello?');
+		return {
+			version,
+			defaultOutput: '../generated',
+			prettyName: GENERATOR_NAME,
+		};
+	},
+	onGenerate: async (options: GeneratorOptions) => {
+		const relations = genRelations(options.dmmf);
+		const writeLocation = path.join(options.generator.output?.value!, `schema.ts`);
 
-      const writeLocation = path.join(
-        options.generator.output?.value!,
-        `${enumInfo.name}.ts`,
-      )
-
-      await writeFileSafely(writeLocation, tsEnum)
-    })
-  },
-})
+		await writeFileSafely(writeLocation, relations);
+	},
+});
