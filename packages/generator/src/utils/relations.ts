@@ -13,3 +13,13 @@ export function getRelationSet(fields: DMMF.Model['fields']) {
 		return relations;
 	}, {});
 }
+
+export function getReversedRelationSet(name: DMMF.Model['name'], models: DMMF.Model[]) {
+	return models.reduce<string[]>((arr, model) => {
+		if (model.fields.some(field => field.type === name)) {
+			arr.push(model.name);
+		}
+
+		return arr;
+	}, []);
+}

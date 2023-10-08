@@ -10,6 +10,7 @@ export const mockers: ModelSeeds = {
 			},
 		}),
 	UserSubscription: [
+		null,
 		({ User }) =>
 			database.userSubscription.create({
 				data: {

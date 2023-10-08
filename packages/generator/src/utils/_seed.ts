@@ -8,7 +8,9 @@ export async function seedModel<ModelName extends ModelNames>(
 	if (!mockFunctions) {
 		throw new Error(`Missing seed-function for "${target}"`);
 	}
-	const functionArray: SingleResolver<ModelName>[] = Array.isArray(mockFunctions) ? mockFunctions : [mockFunctions];
+	const functionArray: (SingleResolver<ModelName> | null)[] = Array.isArray(mockFunctions)
+		? mockFunctions
+		: [mockFunctions];
 
 	let ret: PromiseLike<SeededResolverReturn<ModelName>[]>[] = [];
 
@@ -29,6 +31,10 @@ export async function seedModel<ModelName extends ModelNames>(
 				...modelData,
 			};
 		}, {}) as ResolverObject<ModelName>;
+
+		if (mockFunction === null) {
+			continue;
+		}
 
 		const queries = mockFunction(relatedData);
 		let returnArray = Array.isArray(queries) ? queries : [queries];

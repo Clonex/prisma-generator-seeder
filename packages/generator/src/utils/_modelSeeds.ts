@@ -22,7 +22,7 @@ type SeededResolverReturn<ModelName extends ModelNames> = PromiseLike<
 export type SingleResolver<ModelName extends ModelNames> = (
 	parents: ResolverObject<ModelName>
 ) => MaybeArray<SeededResolverReturn<ModelName>>;
-export type Resolver<ModelName extends ModelNames> = MaybeArray<SingleResolver<ModelName>>;
+export type Resolver<ModelName extends ModelNames> = MaybeArray<SingleResolver<ModelName> | null>;
 
 export type ModelSeeds = { [ModelName in ModelNames]: Resolver<ModelName> };
 export type NullableModelSeeds = { [ModelName in ModelNames]?: Resolver<ModelName> };
