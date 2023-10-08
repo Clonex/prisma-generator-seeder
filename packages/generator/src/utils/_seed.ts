@@ -29,7 +29,7 @@ export async function seedModel<ModelName extends ModelNames>(
 	target: ModelName,
 	modelSeeds: ModelSeeds,
 	childData: Partial<ResolverObject<ModelName>> = {}
-): Promise<Awaited<SeededResolverReturn<ModelName>>[][]> {
+): Promise<Awaited<SeededResolverReturn<ModelName>>[]> {
 	const mockFunctions = modelSeeds[target];
 	if (!mockFunctions) {
 		throw new Error(`Missing seed-function for "${target}"`);
@@ -47,7 +47,7 @@ export async function seedModel<ModelName extends ModelNames>(
 			await Promise.all(
 				neededModels.map(async model => {
 					return {
-						[model]: await seedModel(model, modelSeeds),
+						[model]: (await seedModel(model, modelSeeds)).at(0),
 					};
 				})
 			)
@@ -69,7 +69,7 @@ export async function seedModel<ModelName extends ModelNames>(
 		);
 	}
 
-	return Promise.all(ret);
+	return Promise.all(ret).then(data => data.flat());
 }
 
 export async function seedDatabase(modelSeeds: ModelSeeds) {
