@@ -22,8 +22,10 @@ generatorHandler({
 		await writeFileSafely(
 			options.generator.output?.value!,
 			`${modelSeedTypes}
-			${relations}
-			${seedTools}`
+// relations
+${relations}
+
+${seedTools}`
 		);
 	},
 });

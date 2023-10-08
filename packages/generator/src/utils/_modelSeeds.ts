@@ -1,8 +1,11 @@
 // @ts-nocheck
 
-import { Prisma, PrismaPromise } from '@prisma/client';
+// _modelSeeds.ts
+import { Prisma } from '@prisma/client';
 
 export type Models = Prisma.TypeMap['model'];
+
+type MaybeArray<T> = T[] | T;
 
 export type ModelNames = keyof ModelRelations;
 
@@ -12,9 +15,14 @@ export type ResolverObject<ModelName extends ModelNames> = {
 		: unknown;
 };
 
-export type Resolver<ModelName extends ModelNames> = (
+type SeededResolverReturn<ModelName extends ModelNames> = PromiseLike<
+	Models[ModelName]['operations']['create']['result']
+>;
+
+export type SingleResolver<ModelName extends ModelNames> = (
 	parents: ResolverObject<ModelName>
-) => PrismaPromise<Models[ModelName]['operations']['create']['result']>;
+) => MaybeArray<SeededResolverReturn<ModelName>>;
+export type Resolver<ModelName extends ModelNames> = MaybeArray<SingleResolver<ModelName>>;
 
 export type ModelSeeds = { [ModelName in ModelNames]: Resolver<ModelName> };
 export type NullableModelSeeds = { [ModelName in ModelNames]?: Resolver<ModelName> };
