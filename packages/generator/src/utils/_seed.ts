@@ -4,16 +4,18 @@
 async function seedParentRelation<ModelName extends ModelNames>(
 	target: ModelName,
 	data: Awaited<SeededResolverReturn<ModelName>>[],
-	modelSeeds: ModelSeeds
+	modelSeeds: ModelSeeds,
+	childData: Partial<ResolverObject<ModelName>> = {}
 ) {
-	const parents = modelRelationsRevereLookup[target];
+	const parents = modelRelationsRevereLookup[target].filter(parent => !(parent in childData));
 	if (parents.length > 0) {
 		await Promise.all(
 			data
 				.map(resolvedData =>
 					parents.map(parent =>
 						seedModel(parent as ModelNames, modelSeeds, {
-							[target]: resolvedData.id,
+							...childData,
+							[target]: resolvedData,
 						})
 					)
 				)
@@ -62,14 +64,12 @@ export async function seedModel<ModelName extends ModelNames>(
 
 		const queries = mockFunction(relatedData);
 		let returnArray = Array.isArray(queries) ? queries : [queries];
-		ret.push(Promise.all(returnArray));
+		ret.push(
+			Promise.all(returnArray).then(resolvedData => seedParentRelation(target, resolvedData, modelSeeds, childData))
+		);
 	}
 
-	const data = await Promise.all(ret);
-
-	await Promise.all(data.map(resolvedData => seedParentRelation(target, resolvedData, modelSeeds)));
-
-	return data;
+	return Promise.all(ret);
 }
 
 export async function seedDatabase(modelSeeds: ModelSeeds) {
