@@ -1,9 +1,33 @@
 // @ts-nocheck
 // _seed.ts
+
+async function seedParentRelation<ModelName extends ModelNames>(
+	target: ModelName,
+	data: Awaited<SeededResolverReturn<ModelName>>[],
+	modelSeeds: ModelSeeds
+) {
+	const parents = modelRelationsRevereLookup[target];
+	if (parents.length > 0) {
+		await Promise.all(
+			data
+				.map(resolvedData =>
+					parents.map(parent =>
+						seedModel(parent as ModelNames, modelSeeds, {
+							[target]: resolvedData.id,
+						})
+					)
+				)
+				.flat()
+		);
+	}
+	return data;
+}
+
 export async function seedModel<ModelName extends ModelNames>(
 	target: ModelName,
-	modelSeeds: ModelSeeds
-): Promise<SeededResolverReturn<ModelName>[][]> {
+	modelSeeds: ModelSeeds,
+	childData: Partial<ResolverObject<ModelName>> = {}
+): Promise<Awaited<SeededResolverReturn<ModelName>>[][]> {
 	const mockFunctions = modelSeeds[target];
 	if (!mockFunctions) {
 		throw new Error(`Missing seed-function for "${target}"`);
@@ -12,10 +36,10 @@ export async function seedModel<ModelName extends ModelNames>(
 		? mockFunctions
 		: [mockFunctions];
 
-	let ret: PromiseLike<SeededResolverReturn<ModelName>[]>[] = [];
+	let ret: PromiseLike<Awaited<SeededResolverReturn<ModelName>>[]>[] = [];
 
 	for (const mockFunction of functionArray) {
-		const neededModels = Object.keys(modelRelations[target]) as ModelNames[];
+		const neededModels = (Object.keys(modelRelations[target]) as ModelNames[]).filter(key => !(key in childData));
 
 		const relatedData = (
 			await Promise.all(
@@ -30,7 +54,7 @@ export async function seedModel<ModelName extends ModelNames>(
 				...obj,
 				...modelData,
 			};
-		}, {}) as ResolverObject<ModelName>;
+		}, childData) as ResolverObject<ModelName>;
 
 		if (mockFunction === null) {
 			continue;
@@ -38,10 +62,14 @@ export async function seedModel<ModelName extends ModelNames>(
 
 		const queries = mockFunction(relatedData);
 		let returnArray = Array.isArray(queries) ? queries : [queries];
-		ret.push(Promise.all(returnArray) as Promise<SeededResolverReturn<ModelName>[]>);
+		ret.push(Promise.all(returnArray));
 	}
 
-	return Promise.all(ret);
+	const data = await Promise.all(ret);
+
+	await Promise.all(data.map(resolvedData => seedParentRelation(target, resolvedData, modelSeeds)));
+
+	return data;
 }
 
 export async function seedDatabase(modelSeeds: ModelSeeds) {
