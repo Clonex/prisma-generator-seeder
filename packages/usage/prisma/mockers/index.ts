@@ -16,7 +16,6 @@ export const mockers: ModelSeeds = {
 			},
 		}),
 	BusinessSubscription: [
-		null,
 		({ User, Business }) =>
 			database.businessSubscription.create({
 				data: {
@@ -25,6 +24,7 @@ export const mockers: ModelSeeds = {
 					businessId: Business.id,
 				},
 			}),
+		null,
 		({ User, Business }) =>
 			database.businessSubscription.create({
 				data: {

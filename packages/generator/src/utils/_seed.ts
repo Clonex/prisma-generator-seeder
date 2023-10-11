@@ -26,20 +26,6 @@ export async function downStreamSeed<ModelName extends ModelNames>(
 
 	for (const seedModelFunc of functionArray) {
 		const neededModels = (Object.keys(modelRelations[node]) as ModelNames[]).filter(key => !(key in refs));
-		// const modelData = (
-		// 	await Promise.all(
-		// 		neededModels.map(async model => {
-		// 			return {
-		// 				[model]: firstElement(await seedModel(model, modelSeeds)), //TODO: Throws away other cases??
-		// 			};
-		// 		})
-		// 	)
-		// ).reduce((obj, modelData) => {
-		// 	return {
-		// 		...obj,
-		// 		...modelData,
-		// 	};
-		// }, refs) as ResolverObject<ModelName>;
 
 		const modelData = (
 			await Promise.all(
@@ -59,7 +45,6 @@ export async function downStreamSeed<ModelName extends ModelNames>(
 		if (seedModelFunc === null) {
 			continue;
 		}
-		// const modelData = refs as ResolverObject<ModelName>; // TODO: Fix!
 
 		const temp = seedModelFunc(modelData);
 		const newModelDataElements = ensureArray(temp);
@@ -68,7 +53,6 @@ export async function downStreamSeed<ModelName extends ModelNames>(
 			const testData = firstElement(await newModelData);
 
 			const children = modelRelationsRevereLookup[node];
-			// console.log('traverseChildren', { node, children, refs });
 			refs = {
 				...refs,
 				[node]: testData,
@@ -77,38 +61,17 @@ export async function downStreamSeed<ModelName extends ModelNames>(
 			for (const child of children) {
 				const name = child as ModelNames;
 				if (!refs[name]) {
-					console.log('Create', { from: node, to: name });
-					await downStreamSeed(name, modelSeeds, refs);
+					const test = await downStreamSeed(name, modelSeeds, refs);
+					console.log('Created', { from: node, to: name, ret: test });
 				}
 			}
+			ret.push(testData);
 		}
 
 		refs = {};
 	}
-}
 
-async function seedParentRelation<ModelName extends ModelNames>(
-	target: ModelName,
-	data: Awaited<SeededResolverReturn<ModelName>>[],
-	modelSeeds: ModelSeeds,
-	childData: Partial<ResolverObject<ModelName>> = {}
-) {
-	const parents = modelRelationsRevereLookup[target].filter(parent => !(parent in childData));
-	if (parents.length > 0) {
-		await Promise.all(
-			data
-				.map(resolvedData =>
-					parents.map(parent =>
-						seedModel(parent as ModelNames, modelSeeds, {
-							...childData,
-							[target]: resolvedData,
-						})
-					)
-				)
-				.flat()
-		);
-	}
-	return data;
+	return ret;
 }
 
 export async function seedModel<ModelName extends ModelNames>(
