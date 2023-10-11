@@ -1,34 +1,122 @@
 // @ts-nocheck
+// _seed.ts
+function ensureArray<T>(element: T | T[]) {
+	return Array.isArray(element) ? element : [element];
+}
+
+function firstElement<T>(element: T | T[]) {
+	return Array.isArray(element) ? element.at(0) : element;
+}
+
+type Refs = Partial<{ [key in ModelNames]: Models[key]['operations']['create']['result'] }>;
+
+// Only traverses down the tree
+export async function downStreamSeed<ModelName extends ModelNames>(
+	node: ModelName,
+	modelSeeds: ModelSeeds,
+	refs: Refs = {}
+) {
+	const mockFunctions = modelSeeds[node];
+	if (!mockFunctions) {
+		throw new Error(`Missing seed-function for "${node}"`);
+	}
+	const functionArray: (SingleResolver<ModelName> | null)[] = ensureArray(mockFunctions);
+
+	let ret: PromiseLike<Awaited<SeededResolverReturn<ModelName>>[]>[] = [];
+
+	for (const seedModelFunc of functionArray) {
+		const neededModels = (Object.keys(modelRelations[node]) as ModelNames[]).filter(key => !(key in refs));
+
+		const modelData = (
+			await Promise.all(
+				neededModels.map(async model => {
+					return {
+						[model]: firstElement(await seedModel(model, modelSeeds)), //TODO: Throws away other cases??
+					};
+				})
+			)
+		).reduce((obj, modelData) => {
+			return {
+				...obj,
+				...modelData,
+			};
+		}, refs) as ResolverObject<ModelName>;
+
+		if (seedModelFunc === null) {
+			continue;
+		}
+
+		const temp = seedModelFunc(modelData);
+		const newModelDataElements = ensureArray(temp);
+
+		for (const newModelData of newModelDataElements) {
+			const testData = firstElement(await newModelData);
+
+			const children = modelRelationsRevereLookup[node];
+			refs = {
+				...refs,
+				[node]: testData,
+			};
+
+			for (const child of children) {
+				const name = child as ModelNames;
+				if (!refs[name]) {
+					const test = await downStreamSeed(name, modelSeeds, refs);
+					console.log('Created', { from: node, to: name, ret: test });
+				}
+			}
+			ret.push(testData);
+		}
+
+		refs = {};
+	}
+
+	return ret;
+}
 
 export async function seedModel<ModelName extends ModelNames>(
 	target: ModelName,
-	modelSeeds: ModelSeeds
-): Promise<Resolver<ModelName>> {
-	const mockFunction = modelSeeds[target];
-	if (!mockFunction) {
-		throw new Error(`Missing mocker for "${target}"`);
+	modelSeeds: ModelSeeds,
+	refs: Refs = {}
+): Promise<Awaited<SeededResolverReturn<ModelName>>[]> {
+	const mockFunctions = modelSeeds[target];
+	if (!mockFunctions) {
+		throw new Error(`Missing seed-function for "${target}"`);
+	}
+	const functionArray: (SingleResolver<ModelName> | null)[] = ensureArray(mockFunctions);
+
+	let ret: PromiseLike<Awaited<SeededResolverReturn<ModelName>>[]>[] = [];
+
+	for (const mockFunction of functionArray) {
+		const neededModels = (Object.keys(modelRelations[target]) as ModelNames[]).filter(key => !(key in refs));
+
+		const modelData = (
+			await Promise.all(
+				neededModels.map(async model => {
+					return {
+						[model]: firstElement(await seedModel(model, modelSeeds)), //TODO: Throws away other cases??
+					};
+				})
+			)
+		).reduce((obj, modelData) => {
+			return {
+				...obj,
+				...modelData,
+			};
+		}, refs) as ResolverObject<ModelName>;
+
+		if (mockFunction === null) {
+			continue;
+		}
+
+		const queries = mockFunction(modelData);
+		let returnArray = Array.isArray(queries) ? queries : [queries];
+		ret.push(Promise.all(returnArray));
+
+		refs = {};
 	}
 
-	const neededModels = Object.keys(modelRelations[target]) as ModelNames[];
-
-	const relatedData = (
-		await Promise.all(
-			neededModels.map(async model => {
-				return {
-					[model]: await seedModel(model, modelSeeds),
-				};
-			})
-		)
-	).reduce((obj, modelData) => {
-		return {
-			...obj,
-			...modelData,
-		};
-	}, {}) as ResolverObject<ModelName>;
-
-	const object = await mockFunction(relatedData);
-
-	return object as Resolver<ModelName>;
+	return Promise.all(ret).then(data => data.flat());
 }
 
 export async function seedDatabase(modelSeeds: ModelSeeds) {

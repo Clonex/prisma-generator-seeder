@@ -3,28 +3,49 @@ import { faker } from '@faker-js/faker';
 import { database } from '../../database';
 
 export const mockers: ModelSeeds = {
-	Country: () => {
-		return database.country.create({
+	User: () =>
+		database.user.create({
+			data: {
+				name: faker.person.fullName(),
+			},
+		}),
+	Business: () =>
+		database.business.create({
 			data: {
 				name: faker.company.name(),
 			},
-		});
-	},
-	House: ({ Country }) => {
-		return database.house.create({
+		}),
+	BusinessSubscription: [
+		({ User, Business }) =>
+			database.businessSubscription.create({
+				data: {
+					expireAt: new Date('0'), // Expired
+					userId: User.id,
+					businessId: Business.id,
+				},
+			}),
+		null,
+		({ User, Business }) =>
+			database.businessSubscription.create({
+				data: {
+					expireAt: new Date(Date.now() * 10), // Active
+					userId: User.id,
+					businessId: Business.id,
+				},
+			}),
+	],
+	UserLog: ({ User }) => [
+		database.userLog.create({
 			data: {
-				address: faker.location.streetAddress(),
-				countryId: Country.id,
+				comment: faker.word.words(10),
+				userId: User.id,
 			},
-		});
-	},
-	Person: ({ Country, House }) => {
-		return database.person.create({
+		}),
+		database.userLog.create({
 			data: {
-				fullName: faker.person.fullName(),
-				countryId: Country.id,
-				houseId: House.id,
+				comment: faker.word.words(10),
+				userId: User.id,
 			},
-		});
-	},
+		}),
+	],
 };

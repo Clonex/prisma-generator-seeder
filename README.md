@@ -44,32 +44,50 @@ import { seedDatabase, ModelSeeds } from './seeding';
 import { database } from '../../database';
 import { faker } from '@faker-js/faker';
 
-const modelSeeds: ModelSeeds = {
-	Country: () => {
-		return database.country.create({
+const mockers: ModelSeeds = {
+	User: () =>
+		database.user.create({
 			data: {
-				name: faker.company.name(),
+				name: faker.person.fullName(),
 			},
-		});
-	},
-	House: ({ Country }) => {
-		return database.house.create({
+		}),
+	BusinessSubscription: [
+		null,
+		({ User }) =>
+			database.businessSubscription.create({
+				data: {
+					expireAt: new Date('0'), // Expired
+					userId: User.id,
+				},
+			}),
+		({ User }) =>
+			database.businessSubscription.create({
+				data: {
+					expireAt: new Date(Date.now() * 10), // Active
+					userId: User.id,
+				},
+			}),
+	],
+	UserLog: ({ User }) => [
+		database.userLog.create({
 			data: {
-				address: faker.location.streetAddress(),
-				countryId: Country.id,
+				comment: faker.word.words(10),
+				userId: User.id,
 			},
-		});
-	},
-	Person: ({ Country, House }) => {
-		return database.person.create({
+		}),
+		database.userLog.create({
 			data: {
-				fullName: faker.person.fullName(),
-				countryId: Country.id,
-				houseId: House.id,
+				comment: faker.word.words(10),
+				userId: User.id,
 			},
-		});
-	},
+		}),
+	],
 };
 
 seedDatabase(modelSeeds).then(() => console.log('Seeded database'));
 ```
+
+## Known issues
+
+- It will create models that are not used. Currently the goal is to ensure that all models and relations are generated,
+  without considering unnecessary model.

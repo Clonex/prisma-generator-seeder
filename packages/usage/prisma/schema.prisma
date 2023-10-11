@@ -13,27 +13,37 @@ datasource db {
   url      = "file:./dev.db"
 }
 
-model Country {
-  id     String   @id @default(uuid())
-  name   String
-  people Person[]
-  houses House[]
+model User {
+  id        String    @id @default(uuid())
+  name      String
+  deletedAt DateTime?
+
+  subscription BusinessSubscription[]
+  UserLog      UserLog[]
 }
 
-model House {
+model BusinessSubscription {
+  id         String   @id @default(uuid())
+  expireAt   DateTime
+  userId     String
+  businessId String?
+
+  user     User      @relation(fields: [userId], references: [id])
+  business Business? @relation(fields: [businessId], references: [id])
+}
+
+model Business {
+  id   String @id @default(uuid())
+  name String
+
+  subscriptions BusinessSubscription[]
+}
+
+model UserLog {
   id        String   @id @default(uuid())
-  address   String
-  people    Person[]
-  countryId String
-  country   Country  @relation(fields: [countryId], references: [id])
-}
+  comment   String
+  createdAt DateTime @default(now())
+  userId    String
 
-model Person {
-  id        String @id @default(uuid())
-  fullName  String
-  houseId   String
-  countryId String
-
-  house   House   @relation(fields: [houseId], references: [id])
-  country Country @relation(fields: [countryId], references: [id])
+  user User @relation(fields: [userId], references: [id])
 }
