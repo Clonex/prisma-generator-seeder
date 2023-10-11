@@ -9,20 +9,28 @@ export const mockers: ModelSeeds = {
 				name: faker.person.fullName(),
 			},
 		}),
-	UserSubscription: [
+	Business: () =>
+		database.business.create({
+			data: {
+				name: faker.company.name(),
+			},
+		}),
+	BusinessSubscription: [
 		null,
-		({ User }) =>
-			database.userSubscription.create({
+		({ User, Business }) =>
+			database.businessSubscription.create({
 				data: {
 					expireAt: new Date('0'), // Expired
 					userId: User.id,
+					businessId: Business.id,
 				},
 			}),
-		({ User }) =>
-			database.userSubscription.create({
+		({ User, Business }) =>
+			database.businessSubscription.create({
 				data: {
 					expireAt: new Date(Date.now() * 10), // Active
 					userId: User.id,
+					businessId: Business.id,
 				},
 			}),
 	],

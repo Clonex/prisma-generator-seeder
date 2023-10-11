@@ -19,6 +19,7 @@
 		"dev": "npx tsc -w",
 		"build": "npx tsc",
 		"prepack": "yarn build",
+		"tester": "ts-node src/__tests__/test.ts ",
 		"test": "jest"
 	},
 	"dependencies": {

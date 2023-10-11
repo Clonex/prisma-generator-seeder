@@ -18,16 +18,25 @@ model User {
   name      String
   deletedAt DateTime?
 
-  subscription UserSubscription[]
+  subscription BusinessSubscription[]
   UserLog      UserLog[]
 }
 
-model UserSubscription {
-  id       String   @id @default(uuid())
-  expireAt DateTime
-  userId   String
+model BusinessSubscription {
+  id         String   @id @default(uuid())
+  expireAt   DateTime
+  userId     String
+  businessId String?
 
-  user User @relation(fields: [userId], references: [id])
+  user     User      @relation(fields: [userId], references: [id])
+  business Business? @relation(fields: [businessId], references: [id])
+}
+
+model Business {
+  id   String @id @default(uuid())
+  name String
+
+  subscriptions BusinessSubscription[]
 }
 
 model UserLog {
